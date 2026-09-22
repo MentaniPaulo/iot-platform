@@ -5,7 +5,9 @@
     "map": "Map",
     "sensors": "Sensors",
     "howItWorks": "How It Works",
-    "platform": "IoT Platform"
+    "platform": "IoT Platform",
+    "skipToContent": "Skip to content",
+    "mainNavigation": "Main navigation"
   },
   "footer": {
     "tagline": "EcoSense IoT Platform — Environmental data from Sensor.Community & Open-Meteo",

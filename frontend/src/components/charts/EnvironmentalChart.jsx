@@ -49,8 +49,10 @@ export function TopCitiesChart({ cities = [] }) {
     }],
   };
 
+  const summary = top10.map(c => `${c.name}: ${(c.icaud?.score ?? 0).toFixed(0)}`).join(', ');
+
   return (
-    <div style={{ height: 300 }}>
+    <div role="img" aria-label={`Gráfico de barras — top 10 cidades por ICAU-D: ${summary}`} style={{ height: 300 }}>
       <Bar data={data} options={{
         ...defaultOptions,
         plugins: {
@@ -92,8 +94,10 @@ export function ClassificationDonut({ cities = [] }) {
     }],
   };
 
+  const donutSummary = CLASSIFICATIONS.map((c, i) => `${c.label}: ${counts[i]}`).join(', ');
+
   return (
-    <div style={{ height: 260 }}>
+    <div role="img" aria-label={`Gráfico de rosca — distribuição de cidades por classificação: ${donutSummary}`} style={{ height: 260 }}>
       <Doughnut data={data} options={{
         responsive: true,
         maintainAspectRatio: false,
@@ -123,7 +127,7 @@ export function CityICAUDHistoryChart({ history = [] }) {
 
   if (points.length < 2) {
     return (
-      <div className="flex items-center justify-center h-40 text-sm text-gray-400">
+      <div role="status" className="flex items-center justify-center h-40 text-sm text-gray-400">
         Histórico ainda sendo acumulado — volte em algumas horas.
       </div>
     );
@@ -149,8 +153,12 @@ export function CityICAUDHistoryChart({ history = [] }) {
     }],
   };
 
+  const firstScore = scores[0].toFixed(0);
+  const lastScore = scores[scores.length - 1].toFixed(0);
+  const trendSummary = `ICAU-D variou de ${firstScore} para ${lastScore} ao longo de ${points.length} leituras (mínimo ${Math.min(...scores).toFixed(0)}, máximo ${Math.max(...scores).toFixed(0)})`;
+
   return (
-    <div style={{ height: 260 }}>
+    <div role="img" aria-label={`Gráfico de linha — histórico do ICAU-D: ${trendSummary}`} style={{ height: 260 }}>
       <Line data={data} options={{
         ...defaultOptions,
         plugins: {
@@ -218,8 +226,10 @@ export function CityMeasurementsChart({ measurements = {} }) {
     }],
   };
 
+  const measurementsSummary = labels.map((l, i) => `${l}: ${values[i]}`).join(', ');
+
   return (
-    <div style={{ height: 260 }}>
+    <div role="img" aria-label={`Gráfico de barras — medições atuais: ${measurementsSummary}`} style={{ height: 260 }}>
       <Bar data={data} options={{
         ...defaultOptions,
         plugins: { ...defaultOptions.plugins, legend: { display: false } },

@@ -166,10 +166,11 @@ export default function CityDetail() {
       <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <h2 className="text-base font-semibold text-gray-800">Histórico do ICAU-D</h2>
-          <div className="flex gap-2">
+          <div className="flex gap-2" role="group" aria-label="Período do histórico">
             <button
               onClick={() => setHistoryPeriod('week')}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+              aria-pressed={historyPeriod === 'week'}
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1 ${
                 historyPeriod === 'week' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -177,7 +178,8 @@ export default function CityDetail() {
             </button>
             <button
               onClick={() => setHistoryPeriod('month')}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+              aria-pressed={historyPeriod === 'month'}
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1 ${
                 historyPeriod === 'month' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >

@@ -22,6 +22,13 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen bg-gray-50 font-display">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-green-600 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm focus:font-medium"
+      >
+        {t('nav.skipToContent', 'Pular para o conteúdo')}
+      </a>
+
       <BackendBanner isHealthy={isHealthy} isChecking={isChecking} />
 
       <header className="bg-white border-b border-gray-100 sticky top-0 z-40 shadow-sm">
@@ -34,21 +41,22 @@ export default function Layout({ children }) {
             </Link>
 
             <div className="flex items-center gap-1">
-              <nav className="flex items-center gap-1">
+              <nav aria-label={t('nav.mainNavigation', 'Navegação principal')} className="flex items-center gap-1">
                 {navLinks.map(link => (
                   <NavLink
                     key={link.to}
                     to={link.to}
                     end={link.to === '/'}
+                    aria-label={link.label}
                     className={({ isActive }) =>
-                      `flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      `flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1 ${
                         isActive
                           ? 'bg-green-50 text-green-700'
                           : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                       }`
                     }
                   >
-                    <span>{link.icon}</span>
+                    <span aria-hidden="true">{link.icon}</span>
                     <span className="hidden sm:inline">{link.label}</span>
                   </NavLink>
                 ))}
@@ -58,7 +66,8 @@ export default function Layout({ children }) {
               <button
                 onClick={toggleLang}
                 title={i18n.language === 'en' ? 'Switch to Portuguese' : 'Mudar para Inglês'}
-                className="ml-2 flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold border border-gray-200 bg-white hover:bg-gray-50 transition-colors text-gray-700"
+                aria-label={i18n.language === 'en' ? 'Switch to Portuguese' : 'Mudar para Inglês'}
+                className="ml-2 flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold border border-gray-200 bg-white hover:bg-gray-50 transition-colors text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1"
               >
                 {i18n.language === 'en' ? '🇧🇷 PT' : '🇺🇸 EN'}
               </button>
@@ -67,7 +76,7 @@ export default function Layout({ children }) {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main id="main-content" tabIndex={-1} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 focus:outline-none">
         {children}
       </main>
 

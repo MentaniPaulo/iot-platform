@@ -96,13 +96,15 @@ export default function ICAUDExplainer() {
   const TabButton = ({ id, label, icon }) => (
     <button
       onClick={() => setActiveTab(id)}
-      className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${
+      role="tab"
+      aria-selected={activeTab === id}
+      className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1 ${
         activeTab === id
           ? 'bg-green-600 text-white shadow-md'
           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
       }`}
     >
-      <span>{icon}</span>
+      <span aria-hidden="true">{icon}</span>
       {label}
     </button>
   );
@@ -122,7 +124,7 @@ export default function ICAUDExplainer() {
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-3 border-b border-gray-200 pb-4">
+      <div role="tablist" aria-label={t('explainer.title')} className="flex flex-wrap gap-3 border-b border-gray-200 pb-4">
         <TabButton id="arquitetura" label={t('explainer.tabArchitecture')} icon="🏗️" />
         <TabButton id="icaud" label={t('explainer.tabIcaud')} icon="📊" />
         <TabButton id="fontes" label={t('explainer.tabSources')} icon="🌍" />
