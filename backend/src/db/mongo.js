@@ -29,7 +29,7 @@ if (isAvailable && mongoose) {
   const sensorReadingSchema = new Schema(
     {
       sensorId: { type: String, required: true, index: true },
-      source: { type: String, enum: ['sensor_community', 'open_meteo'], required: true },
+      source: { type: String, enum: ['sensor_community', 'open_meteo', 'open_meteo_aq'], required: true },
       name: String,
       location: {
         lat: { type: Number, required: true },
@@ -52,8 +52,23 @@ if (isAvailable && mongoose) {
       sensorCount: Number,
       exposure: { type: String, enum: ['indoor', 'outdoor', null] },
       recordedAt: { type: Date, default: Date.now },
+      // Hora cheia de recordedAt (minutos/segundos zerados) — usada como chave de
+      // idempotência: um sensor só pode ter 1 leitura por hora, mesmo que o job de
+      // coleta rode mais de uma vez no período.
+      readingHour: { type: Date, required: true },
     },
     { timestamps: true }
+  );
+
+  // Idempotência: no máximo 1 leitura por sensor por hora.
+  // partialFilterExpression (não sparse) porque documentos já existentes (gravados
+  // antes desta mudança) têm sensorId mas não readingHour — um índice sparse comum
+  // ainda os inclui nesse caso (só ignora quando TODOS os campos estão ausentes),
+  // causando erro de duplicidade no build. O partial index exclui corretamente
+  // qualquer doc sem readingHour.
+  sensorReadingSchema.index(
+    { sensorId: 1, readingHour: 1 },
+    { unique: true, partialFilterExpression: { readingHour: { $exists: true } } }
   );
 
   // TTL index — auto-delete readings older than 30 days
@@ -124,25 +139,53 @@ export async function disconnectMongo() {
 }
 
 /**
+ * Trunca uma data para a hora cheia (zera minutos/segundos/ms).
+ * Usado como chave de idempotência das leituras.
+ */
+function toReadingHour(date) {
+  const d = new Date(date);
+  d.setMinutes(0, 0, 0);
+  return d;
+}
+
+/**
+ * sensor.icaud.classification vem como objeto completo ({min, max, label, color,
+ * emoji}) de models/icaud.js, mas o schema histórico guarda só o rótulo (String).
+ * Sem isso, o Mongoose falha o cast silenciosamente e a leitura inteira não é salva.
+ */
+function toStoredIcaud(icaud) {
+  if (!icaud) return { score: null, classification: null };
+  return {
+    score: icaud.score ?? null,
+    classification: icaud.classification?.label ?? null,
+  };
+}
+
+/**
  * Save a sensor reading snapshot
  */
 export async function saveSensorReading(sensor) {
   if (!isAvailable || !SensorReading) return;
 
   try {
-    const reading = new SensorReading({
-      sensorId: sensor.id,
-      source: sensor.source,
-      name: sensor.name,
-      location: sensor.location,
-      measurements: sensor.measurements,
-      icaud: sensor.icaud,
-      deviceType: sensor.deviceType,
-      sensorCount: sensor.sensorCount,
-      exposure: sensor.exposure,
-      recordedAt: new Date(sensor.lastSeen || Date.now()),
-    });
-    await reading.save();
+    const recordedAt = new Date(sensor.lastSeen || Date.now());
+    await SensorReading.updateOne(
+      { sensorId: sensor.id, readingHour: toReadingHour(recordedAt) },
+      {
+        $set: {
+          source: sensor.source,
+          name: sensor.name,
+          location: sensor.location,
+          measurements: sensor.measurements,
+          icaud: toStoredIcaud(sensor.icaud),
+          deviceType: sensor.deviceType,
+          sensorCount: sensor.sensorCount,
+          exposure: sensor.exposure,
+          recordedAt,
+        },
+      },
+      { upsert: true }
+    );
   } catch (err) {
     logger.debug('SensorReading save error:', err.message);
   }
@@ -155,19 +198,29 @@ export async function saveSensorReadingsBatch(sensors) {
   if (!isAvailable || !SensorReading || sensors.length === 0) return;
 
   try {
-    const readings = sensors.map(sensor => ({
-      sensorId: sensor.id,
-      source: sensor.source,
-      name: sensor.name,
-      location: sensor.location,
-      measurements: sensor.measurements,
-      icaud: sensor.icaud,
-      deviceType: sensor.deviceType,
-      sensorCount: sensor.sensorCount,
-      exposure: sensor.exposure,
-      recordedAt: new Date(sensor.lastSeen || Date.now()),
-    }));
-    await SensorReading.insertMany(readings, { ordered: false });
+    const ops = sensors.map(sensor => {
+      const recordedAt = new Date(sensor.lastSeen || Date.now());
+      return {
+        updateOne: {
+          filter: { sensorId: sensor.id, readingHour: toReadingHour(recordedAt) },
+          update: {
+            $set: {
+              source: sensor.source,
+              name: sensor.name,
+              location: sensor.location,
+              measurements: sensor.measurements,
+              icaud: toStoredIcaud(sensor.icaud),
+              deviceType: sensor.deviceType,
+              sensorCount: sensor.sensorCount,
+              exposure: sensor.exposure,
+              recordedAt,
+            },
+          },
+          upsert: true,
+        },
+      };
+    });
+    await SensorReading.bulkWrite(ops, { ordered: false });
   } catch (err) {
     logger.debug('SensorReading batch save error:', err.message);
   }
