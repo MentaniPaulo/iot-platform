@@ -126,6 +126,7 @@ export default function ICAUDExplainer() {
         <TabButton id="arquitetura" label={t('explainer.tabArchitecture')} icon="🏗️" />
         <TabButton id="icaud" label={t('explainer.tabIcaud')} icon="📊" />
         <TabButton id="fontes" label={t('explainer.tabSources')} icon="🌍" />
+        <TabButton id="v2" label="O que muda na v2.0" icon="🚀" />
       </div>
 
       {/* ============ TAB: ARQUITETURA ============ */}
@@ -635,6 +636,119 @@ export default function ICAUDExplainer() {
                 </li>
               ))}
             </ul>
+          </div>
+        </div>
+      </div>
+      )}
+
+      {/* ============ TAB: O QUE MUDA NA V2.0 ============ */}
+      {activeTab === 'v2' && (
+      <div>
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-1 h-10 bg-teal-500 rounded"></div>
+          <h2 className="text-3xl font-bold text-gray-900">O que muda na v2.0</h2>
+        </div>
+
+        <div className="space-y-8">
+          {/* Intro */}
+          <div className="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-xl border border-teal-100 p-6">
+            <p className="text-gray-700">
+              A versão atual já <strong>coleta</strong> dados e <strong>calcula</strong> o
+              ICAU-D em tempo real. A v2.0 transforma isso numa plataforma de dados de
+              verdade: histórico confiável, tendências, alertas, acessibilidade — e a base
+              técnica para os novos modelos de receita do projeto.
+            </p>
+          </div>
+
+          {/* Limitações x Objetivos */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-orange-50 border border-orange-200 rounded-xl p-6">
+              <h3 className="font-bold text-orange-700 mb-3 flex items-center gap-2">
+                <span>⚠️</span> Limitações de hoje
+              </h3>
+              <ul className="space-y-2 text-sm text-gray-700">
+                <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">●</span>Limitação quanto ao armazenamento do histórico</li>
+                <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">●</span>Inexistência de controle de qualidade dos dados</li>
+                <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">●</span>Falta de identificação de tendências</li>
+                <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">●</span>Ausência de geração de alertas</li>
+                <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">●</span>Não apresenta recursos de acessibilidade</li>
+              </ul>
+            </div>
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+              <h3 className="font-bold text-blue-700 mb-3 flex items-center gap-2">
+                <span>🎯</span> Objetivos da v2.0
+              </h3>
+              <ul className="space-y-2 text-sm text-gray-700">
+                <li className="flex items-start gap-2"><span className="text-blue-500 mt-0.5">●</span>Melhorar como os dados são armazenados, processados e apresentados</li>
+                <li className="flex items-start gap-2"><span className="text-blue-500 mt-0.5">●</span>Armazenar e analisar histórico de dados ambientais</li>
+                <li className="flex items-start gap-2"><span className="text-blue-500 mt-0.5">●</span>Gerar resumos, identificando tendências</li>
+                <li className="flex items-start gap-2"><span className="text-blue-500 mt-0.5">●</span>Emitir alertas sobre alterações relevantes</li>
+                <li className="flex items-start gap-2"><span className="text-blue-500 mt-0.5">●</span>Apresentar informações de forma acessível a todos</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Fases */}
+          <div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">Roteiro em 4 fases</h3>
+            <div className="space-y-3">
+              {[
+                {
+                  num: 1,
+                  badge: 'flex-shrink-0 w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center text-lg font-bold text-teal-600',
+                  tag: 'base de tudo',
+                  title: 'Arrumar a coleta',
+                  desc: 'Garantir que toda leitura capturada seja realmente salva: corrigir a fonte de qualidade do ar descartada silenciosamente, evitar duplicidade e migrar para um formato de banco feito para dados que mudam com o tempo.',
+                },
+                {
+                  num: 2,
+                  badge: 'flex-shrink-0 w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center text-lg font-bold text-emerald-600',
+                  tag: 'destrava os gráficos',
+                  title: 'Montar os resumos',
+                  desc: 'Resumos automáticos por hora e por dia, por sensor e por cidade, além do histórico da nota ICAU-D ao longo do tempo — a tela passa a ler pronto, sem recalcular a cada visita.',
+                },
+                {
+                  num: 3,
+                  badge: 'flex-shrink-0 w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center text-lg font-bold text-purple-600',
+                  tag: 'valor pro usuário',
+                  title: 'Análise: tendências, qualidade, alertas e acessibilidade',
+                  desc: 'Rótulo de tendência (melhorando/estável/piorando), detecção de sensor travado ou fora da faixa, alertas quando um valor foge do padrão, e contraste/leitor de tela/teclado no painel.',
+                },
+                {
+                  num: 4,
+                  badge: 'flex-shrink-0 w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center text-lg font-bold text-amber-600',
+                  tag: 'monetização',
+                  title: 'API pública paga e publicidade',
+                  desc: 'Chave de acesso por cliente, controle de cota/limite de uso e registro de consultas — a base técnica para cobrar por uso da API e sustentar o plano gratuito com publicidade no painel público.',
+                },
+              ].map(phase => (
+                <div key={phase.num} className="flex gap-4 items-start">
+                  <div className={phase.badge}>
+                    {phase.num}
+                  </div>
+                  <div className="flex-1 bg-white border border-gray-100 rounded-lg p-4">
+                    <h4 className="font-semibold text-gray-900 flex items-center gap-2 flex-wrap">
+                      {phase.title}
+                      <span className="text-[10px] uppercase tracking-wide font-bold text-teal-700 bg-teal-100 px-2 py-0.5 rounded-full">
+                        {phase.tag}
+                      </span>
+                    </h4>
+                    <p className="text-sm text-gray-600 mt-1">{phase.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Por onde começar */}
+          <div className="bg-amber-50 border-l-4 border-amber-400 border border-amber-200 rounded-xl p-6">
+            <h3 className="font-semibold text-amber-800 mb-2">Por onde começa</h3>
+            <p className="text-sm text-gray-700">
+              <strong>Fase 1, agora.</strong> Sem ela, todo o histórico acumulado vem
+              furado. A Fase 2 libera os gráficos históricos de verdade no painel, e a
+              Fase 3 entrega tendência, alertas e acessibilidade de uma vez. A Fase 4 é o
+              que viabiliza a API paga e a publicidade previstas no plano de negócios.
+            </p>
           </div>
         </div>
       </div>
