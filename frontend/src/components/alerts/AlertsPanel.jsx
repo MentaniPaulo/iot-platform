@@ -39,7 +39,7 @@ export default function AlertsPanel() {
           {spikes > 0 && <span className="text-red-600 font-normal">— {spikes} pico{spikes !== 1 ? 's' : ''} de poluição</span>}
           {stuck > 0 && spikes === 0 && <span className="text-amber-700 font-normal">— {stuck} sensor{stuck !== 1 ? 'es' : ''} sem variação</span>}
         </span>
-        <span aria-hidden="true" className="text-gray-400 text-xs">{expanded ? '▲ ocultar' : '▼ ver detalhes'}</span>
+        <span aria-hidden="true" className="text-gray-500 text-xs">{expanded ? '▲ ocultar' : '▼ ver detalhes'}</span>
       </button>
 
       {expanded && (

@@ -127,7 +127,7 @@ export function CityICAUDHistoryChart({ history = [] }) {
 
   if (points.length < 2) {
     return (
-      <div role="status" className="flex items-center justify-center h-40 text-sm text-gray-400">
+      <div role="status" className="flex items-center justify-center h-40 text-sm text-gray-500">
         Histórico ainda sendo acumulado — volte em algumas horas.
       </div>
     );

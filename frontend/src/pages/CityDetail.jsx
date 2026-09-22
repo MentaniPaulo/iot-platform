@@ -50,7 +50,7 @@ function ComponentRow({ label, value, weight, icon }) {
         <span className="text-sm font-mono font-semibold text-gray-700 w-10 text-right">
           {value.toFixed(1)}
         </span>
-        <span className="text-xs text-gray-400 w-10">×{(weight * 100).toFixed(0)}%</span>
+        <span className="text-xs text-gray-500 w-10">×{(weight * 100).toFixed(0)}%</span>
       </div>
     </div>
   );
@@ -113,7 +113,7 @@ export default function CityDetail() {
                   color={icaud.classification.color}
                 />
               )}
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-gray-500">
                 {t('cityDetail.activeSensors', { count: sensorCount, plural: sensorCount !== 1 ? 's' : '' })}
               </span>
             </div>
@@ -171,7 +171,7 @@ export default function CityDetail() {
               onClick={() => setHistoryPeriod('week')}
               aria-pressed={historyPeriod === 'week'}
               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1 ${
-                historyPeriod === 'week' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                historyPeriod === 'week' ? 'bg-green-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
               7 dias
@@ -180,7 +180,7 @@ export default function CityDetail() {
               onClick={() => setHistoryPeriod('month')}
               aria-pressed={historyPeriod === 'month'}
               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1 ${
-                historyPeriod === 'month' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                historyPeriod === 'month' ? 'bg-green-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
               30 dias
@@ -208,7 +208,7 @@ export default function CityDetail() {
       </div>
 
       {/* Metadata */}
-      <div className="text-xs text-gray-400 text-right">
+      <div className="text-xs text-gray-500 text-right">
         <span title={formatFullDateTimeBRT(city.lastSeen || city.updatedAt) + ' (BRT)'} className="cursor-help">
           {t('cityDetail.lastReading', { relative: formatRelativeTimeBRT(city.lastSeen || city.updatedAt), full: formatFullDateTimeBRT(city.lastSeen || city.updatedAt) })}
         </span>

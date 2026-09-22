@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useBackendHealth } from '../../hooks/useBackendHealth.js';
 import { BackendBanner } from './BackendBanner.jsx';
+import AccessibilityMenu from './AccessibilityMenu.jsx';
 
 export default function Layout({ children }) {
   const { isHealthy, isChecking } = useBackendHealth();
@@ -24,7 +25,7 @@ export default function Layout({ children }) {
     <div className="min-h-screen bg-gray-50 font-display">
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-green-600 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm focus:font-medium"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-green-700 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm focus:font-medium"
       >
         {t('nav.skipToContent', 'Pular para o conteúdo')}
       </a>
@@ -62,6 +63,10 @@ export default function Layout({ children }) {
                 ))}
               </nav>
 
+              <div className="ml-2">
+                <AccessibilityMenu />
+              </div>
+
               {/* Language toggle */}
               <button
                 onClick={toggleLang}
@@ -82,7 +87,7 @@ export default function Layout({ children }) {
 
       <footer className="border-t border-gray-100 bg-white mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between text-xs text-gray-400">
+          <div className="flex items-center justify-between text-xs text-gray-500">
             <span>{t('footer.tagline')}</span>
             <span>{t('footer.index')}</span>
           </div>

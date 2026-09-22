@@ -200,7 +200,7 @@ export default function Dashboard() {
         </div>
         <div className="flex-shrink-0">
           <ScoreRing score={globalAvgScore} size={100} />
-          <p className="text-xs text-center text-gray-400 mt-1">{t('dashboard.icaudGlobal')}</p>
+          <p className="text-xs text-center text-gray-500 mt-1">{t('dashboard.icaudGlobal')}</p>
         </div>
       </div>
 
@@ -212,7 +212,7 @@ export default function Dashboard() {
           onClick={() => setTimePeriod('live')}
           className={`px-4 py-2 rounded-lg font-medium transition-all ${
             timePeriod === 'live'
-              ? 'bg-green-600 text-white shadow-md'
+              ? 'bg-green-700 text-white shadow-md'
               : 'bg-white border border-gray-200 text-gray-700 hover:border-gray-300'
           }`}
         >
@@ -304,7 +304,7 @@ export default function Dashboard() {
           {mapReady && filteredSensors.length > 0 ? (
             <SensorMap sensors={filteredSensors} height="450px" />
           ) : mapReady && filteredSensors.length === 0 ? (
-            <div className="h-[450px] bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center text-gray-400">
+            <div className="h-[450px] bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center text-gray-500">
               <div className="text-center">
                 <div className="text-4xl mb-2">🗺️</div>
                 <p className="text-sm">{hasActiveFilter ? 'Nenhum sensor corresponde ao filtro' : t('common.loading')}</p>
@@ -321,7 +321,7 @@ export default function Dashboard() {
         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
           <h2 className="text-base font-semibold text-gray-800 mb-4">{t('dashboard.topCities')}</h2>
           {rankingStillLoading || filteredRanking.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-[300px] text-gray-400 gap-2">
+            <div className="flex flex-col items-center justify-center h-[300px] text-gray-500 gap-2">
               <div className="animate-spin text-3xl">⚙️</div>
               <p className="text-sm">{hasActiveFilter && allRanking.length > 0 ? 'Nenhuma cidade corresponde ao filtro' : t('common.loading')}</p>
             </div>
@@ -333,7 +333,7 @@ export default function Dashboard() {
         <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
           <h2 className="text-base font-semibold text-gray-800 mb-4">{t('dashboard.distribution')}</h2>
           {citiesLoading || filteredCities.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-[300px] text-gray-400 gap-2">
+            <div className="flex flex-col items-center justify-center h-[300px] text-gray-500 gap-2">
               <div className="animate-spin text-3xl">⚙️</div>
               <p className="text-sm">{hasActiveFilter && cities.length > 0 ? 'Nenhuma cidade corresponde ao filtro' : t('common.loading')}</p>
             </div>
@@ -354,7 +354,7 @@ export default function Dashboard() {
         {rankingStillLoading ? (
           <Spinner />
         ) : filteredRanking.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-10 text-gray-400 gap-3">
+          <div className="flex flex-col items-center justify-center py-10 text-gray-500 gap-3">
             {hasActiveFilter && allRanking.length > 0 ? (
               <p className="text-sm">Nenhuma cidade corresponde ao filtro</p>
             ) : (
