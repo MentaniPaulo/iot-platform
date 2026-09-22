@@ -11,6 +11,24 @@ import {
 import { CityMeasurementsChart, CityICAUDHistoryChart } from '../components/charts/EnvironmentalChart.jsx';
 import { formatMeasurement } from '../utils/icaud.js';
 import { formatFullDateTimeBRT, formatRelativeTimeBRT } from '../utils/dateFormatter.js';
+import { computeTrend, TREND_META } from '../utils/trend.js';
+
+/** Trend badge — "📈 +4.2 (24h)" style, from pre-computed hourly history */
+function TrendBadge({ delta, label, periodLabel }) {
+  if (delta === null || label === null) return null;
+  const meta = TREND_META[label];
+  const sign = delta > 0 ? '+' : '';
+  return (
+    <span
+      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold"
+      style={{ backgroundColor: `${meta.color}1a`, color: meta.color }}
+      title={`ICAU-D ${sign}${delta} nas últimas ${periodLabel}`}
+    >
+      <span>{meta.icon}</span>
+      {sign}{delta} ({periodLabel})
+    </span>
+  );
+}
 
 const SensorMap = lazy(() => import('../components/map/SensorMap.jsx'));
 
@@ -46,6 +64,10 @@ export default function CityDetail() {
   const { data: city, isLoading, error } = useCity(cityName);
   const [historyPeriod, setHistoryPeriod] = useState('week');
   const { data: history = [], isLoading: historyLoading } = useCityHistory(cityName, historyPeriod);
+  // Tendência sempre usa a janela de 7 dias, independente do toggle do gráfico
+  // (React Query reaproveita o cache quando historyPeriod já é 'week')
+  const { data: weekHistory = [] } = useCityHistory(cityName, 'week');
+  const trend = computeTrend(weekHistory);
 
   if (isLoading) return <div className="py-20"><Spinner size="lg" /></div>;
   if (error) return <ErrorAlert message={`'${cityName}' — ${t('common.noData')}`} />;
@@ -95,6 +117,12 @@ export default function CityDetail() {
                 {t('cityDetail.activeSensors', { count: sensorCount, plural: sensorCount !== 1 ? 's' : '' })}
               </span>
             </div>
+            {(trend.delta24h !== null || trend.delta7d !== null) && (
+              <div className="flex items-center gap-2 mt-3">
+                <TrendBadge delta={trend.delta24h} label={trend.label24h} periodLabel="24h" />
+                <TrendBadge delta={trend.delta7d} label={trend.label7d} periodLabel="7d" />
+              </div>
+            )}
           </div>
           <ScoreRing score={icaud?.score} size={130} />
         </div>
