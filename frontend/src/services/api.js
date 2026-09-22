@@ -49,6 +49,10 @@ export const api = {
   getSensorsHistory: (period = 'week') =>
     client.get('/sensors/history', { params: { period } }),
 
+  /** Get active alerts (pollution spikes + stuck sensors) */
+  getAlerts: () =>
+    client.get('/alerts'),
+
   /** Health check */
   health: () =>
     client.get('/health'),

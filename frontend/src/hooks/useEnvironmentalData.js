@@ -102,6 +102,16 @@ export function useCityHistory(name, period = 'week') {
   });
 }
 
+export function useAlerts() {
+  return useQuery({
+    queryKey: ['alerts'],
+    queryFn:  () => api.getAlerts(),
+    staleTime: 5 * 60 * 1000, // 5 min — alertas devem ficar razoavelmente frescos
+    refetchInterval: 5 * 60 * 1000,
+    select: res => res.data ?? [],
+  });
+}
+
 export function useICAUD(lat, lon) {
   return useQuery({
     queryKey: ['icaud', lat, lon],

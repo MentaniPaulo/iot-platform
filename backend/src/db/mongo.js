@@ -448,6 +448,60 @@ export async function cleanupOldReadings(daysBack = 30) {
 }
 
 /**
+ * Detecta sensores "travados": mesmo valor de PM2.5 e temperatura em todas as
+ * leituras de uma janela de tempo, com leituras suficientes pra não ser
+ * coincidência (Fase 3 — controle de qualidade dos dados).
+ */
+export async function getStuckSensors(hoursBack = 6, minReadings = 3) {
+  if (!isAvailable || !SensorReading) return [];
+
+  try {
+    const since = new Date(Date.now() - hoursBack * 60 * 60 * 1000);
+    const groups = await SensorReading.aggregate([
+      // Só sensores físicos reais — fontes baseadas em modelo (open_meteo,
+      // open_meteo_aq) legitimamente repetem valor entre leituras próximas,
+      // o que geraria falso-positivo de "travado".
+      { $match: { recordedAt: { $gte: since }, source: 'sensor_community' } },
+      { $sort: { recordedAt: -1 } },
+      {
+        $group: {
+          _id: '$sensorId',
+          name: { $first: '$name' },
+          city: { $first: '$location.city' },
+          country: { $first: '$location.country' },
+          readingCount: { $sum: 1 },
+          distinctPm25: { $addToSet: '$measurements.pm25' },
+          distinctTemp: { $addToSet: '$measurements.temperature' },
+          lastSeen: { $max: '$recordedAt' },
+        },
+      },
+      { $match: { readingCount: { $gte: minReadings } } },
+    ]);
+
+    return groups
+      .filter(g => {
+        // "travado" = 1 único valor não-nulo repetido em todas as leituras,
+        // pra pelo menos uma das duas métricas
+        const pm25Stuck = g.distinctPm25.filter(v => v !== null).length === 1 && g.distinctPm25.length <= 1;
+        const tempStuck = g.distinctTemp.filter(v => v !== null).length === 1 && g.distinctTemp.length <= 1;
+        return pm25Stuck || tempStuck;
+      })
+      .map(g => ({
+        sensorId: g._id,
+        name: g.name,
+        city: g.city,
+        country: g.country,
+        readingCount: g.readingCount,
+        hoursChecked: hoursBack,
+        lastSeen: g.lastSeen,
+      }));
+  } catch (err) {
+    logger.debug('getStuckSensors error:', err.message);
+    return [];
+  }
+}
+
+/**
  * Get aggregated sensor stats for a time period (historical averages from MongoDB)
  */
 export async function getHistoricalSensorStats(hoursBack = 168) {

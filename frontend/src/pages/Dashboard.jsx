@@ -9,6 +9,7 @@ import { useSyncedFilters } from '../hooks/useSyncedFilters.js';
 import { formatRelativeTimeBRT, formatFullDateTimeBRT } from '../utils/dateFormatter.js';
 import { StatCard, ScoreRing, Spinner, ErrorAlert } from '../components/ui/index.jsx';
 import RankingTable from '../components/ranking/RankingTable.jsx';
+import AlertsPanel from '../components/alerts/AlertsPanel.jsx';
 import { TopCitiesChart, ClassificationDonut } from '../components/charts/EnvironmentalChart.jsx';
 import { classify, CLASSIFICATIONS, formatMeasurement } from '../utils/icaud.js';
 
@@ -202,6 +203,8 @@ export default function Dashboard() {
           <p className="text-xs text-center text-gray-400 mt-1">{t('dashboard.icaudGlobal')}</p>
         </div>
       </div>
+
+      <AlertsPanel />
 
       {/* Period Filters */}
       <div className="flex flex-wrap gap-2">
