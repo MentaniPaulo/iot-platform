@@ -2,13 +2,13 @@
 // Detailed view for a single city
 
 import { useParams, Link } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useCity } from '../hooks/useEnvironmentalData.js';
+import { useCity, useCityHistory } from '../hooks/useEnvironmentalData.js';
 import {
   ScoreRing, StatCard, ClassificationBadge, Spinner, ErrorAlert, EmptyState
 } from '../components/ui/index.jsx';
-import { CityMeasurementsChart } from '../components/charts/EnvironmentalChart.jsx';
+import { CityMeasurementsChart, CityICAUDHistoryChart } from '../components/charts/EnvironmentalChart.jsx';
 import { formatMeasurement } from '../utils/icaud.js';
 import { formatFullDateTimeBRT, formatRelativeTimeBRT } from '../utils/dateFormatter.js';
 
@@ -44,6 +44,8 @@ export default function CityDetail() {
   const cityName = decodeURIComponent(cityParam);
 
   const { data: city, isLoading, error } = useCity(cityName);
+  const [historyPeriod, setHistoryPeriod] = useState('week');
+  const { data: history = [], isLoading: historyLoading } = useCityHistory(cityName, historyPeriod);
 
   if (isLoading) return <div className="py-20"><Spinner size="lg" /></div>;
   if (error) return <ErrorAlert message={`'${cityName}' — ${t('common.noData')}`} />;
@@ -130,6 +132,36 @@ export default function CityDetail() {
           <h2 className="text-base font-semibold text-gray-800 mb-4">{t('cityDetail.currentMeasurements')}</h2>
           <CityMeasurementsChart measurements={measurements} />
         </div>
+      </div>
+
+      {/* ICAU-D history */}
+      <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+          <h2 className="text-base font-semibold text-gray-800">Histórico do ICAU-D</h2>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setHistoryPeriod('week')}
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                historyPeriod === 'week' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              7 dias
+            </button>
+            <button
+              onClick={() => setHistoryPeriod('month')}
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                historyPeriod === 'month' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              30 dias
+            </button>
+          </div>
+        </div>
+        {historyLoading ? (
+          <div className="flex justify-center py-10"><Spinner /></div>
+        ) : (
+          <CityICAUDHistoryChart history={history} />
+        )}
       </div>
 
       {/* City map */}

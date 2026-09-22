@@ -20,6 +20,7 @@ try {
 let SensorReading = null;
 let CacheEntry = null;
 let GeocodeEntry = null;
+let CityHourlyStat = null;
 
 if (isAvailable && mongoose) {
   const Schema = mongoose.Schema;
@@ -96,10 +97,43 @@ if (isAvailable && mongoose) {
     { timestamps: true }
   );
 
+  // Resumo horário por cidade — Fase 2 do plano de dados: em vez de recalcular
+  // médias sobre sensorreadings bruto a cada request, guardamos 1 doc por
+  // cidade por hora já pronto (ICAU-D + medições agregadas). É a base do
+  // histórico "de verdade" nos gráficos.
+  const cityHourlyStatSchema = new Schema(
+    {
+      city: { type: String, required: true },
+      country: String,
+      hour: { type: Date, required: true }, // hora cheia, mesma convenção de readingHour
+      location: {
+        lat: Number,
+        lon: Number,
+      },
+      measurements: {
+        temperature: Number,
+        humidity: Number,
+        pm25: Number,
+        pm10: Number,
+        windSpeed: Number,
+      },
+      icaud: {
+        score: Number,
+        classification: String,
+      },
+      sensorCount: Number,
+    },
+    { timestamps: true }
+  );
+
+  cityHourlyStatSchema.index({ city: 1, hour: 1 }, { unique: true });
+  cityHourlyStatSchema.index({ hour: 1 }, { expireAfterSeconds: 400 * 24 * 60 * 60 }); // 400 dias
+
   // Criar models
-  SensorReading = model('SensorReading', sensorReadingSchema);
-  CacheEntry = model('CacheEntry', cacheEntrySchema);
-  GeocodeEntry = model('GeocodeEntry', geocodeEntrySchema);
+  SensorReading   = model('SensorReading', sensorReadingSchema);
+  CacheEntry      = model('CacheEntry', cacheEntrySchema);
+  GeocodeEntry    = model('GeocodeEntry', geocodeEntrySchema);
+  CityHourlyStat  = model('CityHourlyStat', cityHourlyStatSchema);
 }
 
 /**
@@ -223,6 +257,62 @@ export async function saveSensorReadingsBatch(sensors) {
     await SensorReading.bulkWrite(ops, { ordered: false });
   } catch (err) {
     logger.debug('SensorReading batch save error:', err.message);
+  }
+}
+
+/**
+ * Salva o resumo horário de cada cidade (1 doc por cidade por hora, upsert).
+ * Chamado logo após fetchAllCities() em refreshData(), reaproveitando os
+ * objetos de cidade já computados — não faz nenhuma query extra de sensores.
+ */
+export async function saveCityHourlyStats(cities) {
+  if (!isAvailable || !CityHourlyStat || !cities || cities.length === 0) return;
+
+  try {
+    const hour = toReadingHour(new Date());
+    const ops = cities
+      .filter(c => c.name && c.location)
+      .map(city => ({
+        updateOne: {
+          filter: { city: city.name, hour },
+          update: {
+            $set: {
+              country: city.country,
+              location: { lat: city.location.lat, lon: city.location.lon },
+              measurements: city.measurements,
+              icaud: {
+                score: city.icaud?.score ?? null,
+                classification: city.icaud?.classification?.label ?? null,
+              },
+              sensorCount: city.sensorCount,
+            },
+          },
+          upsert: true,
+        },
+      }));
+    if (ops.length === 0) return;
+    await CityHourlyStat.bulkWrite(ops, { ordered: false });
+  } catch (err) {
+    logger.debug('CityHourlyStat batch save error:', err.message);
+  }
+}
+
+/**
+ * Histórico de resumos horários de uma cidade nos últimos N dias — já vem
+ * pronto do banco, sem recalcular nada sobre os dados brutos.
+ */
+export async function getCityHourlyHistory(cityName, daysBack = 7) {
+  if (!isAvailable || !CityHourlyStat) return [];
+
+  try {
+    const since = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000);
+    return await CityHourlyStat.find({
+      city: cityName,
+      hour: { $gte: since },
+    }).sort({ hour: 1 }).lean();
+  } catch (err) {
+    logger.debug('getCityHourlyHistory error:', err.message);
+    return [];
   }
 }
 
