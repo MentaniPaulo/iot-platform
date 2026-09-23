@@ -204,10 +204,12 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <AlertsPanel />
+      <div data-tour="alerts-panel">
+        <AlertsPanel />
+      </div>
 
       {/* Period Filters */}
-      <div className="flex flex-wrap gap-2">
+      <div data-tour="period-filters" className="flex flex-wrap gap-2">
         <button
           onClick={() => setTimePeriod('live')}
           className={`px-4 py-2 rounded-lg font-medium transition-all ${
@@ -293,7 +295,7 @@ export default function Dashboard() {
       {isLoading ? <Spinner /> : <GlobalStats cities={filteredCities} sensors={filteredSensors} />}
 
       {/* Map */}
-      <div>
+      <div data-tour="live-map">
         <h2 className="text-lg font-semibold text-gray-800 mb-3">
           {isHistoryMode
             ? t('dashboard.mapHistory', { period: timePeriod === 'week' ? t('dashboard.week') : t('dashboard.month') })
@@ -344,7 +346,7 @@ export default function Dashboard() {
       </div>
 
       {/* Top 10 ranking */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+      <div data-tour="top10-ranking" className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <h2 className="text-base font-semibold text-gray-800">{t('dashboard.top10')}</h2>
           <Link to="/ranking" className="text-sm text-green-600 hover:text-green-700 font-medium">

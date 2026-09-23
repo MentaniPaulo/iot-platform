@@ -1,25 +1,51 @@
 // src/components/ui/Layout.jsx
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBackendHealth } from '../../hooks/useBackendHealth.js';
 import { BackendBanner } from './BackendBanner.jsx';
 import AccessibilityMenu from './AccessibilityMenu.jsx';
+import OnboardingTour from '../tour/OnboardingTour.jsx';
+import { useOnboardingTour } from '../../hooks/useOnboardingTour.js';
 
 export default function Layout({ children }) {
   const { isHealthy, isChecking } = useBackendHealth();
   const { t, i18n } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const tour = useOnboardingTour();
 
   const navLinks = [
-    { to: '/',             label: t('nav.dashboard'),   icon: '📊' },
-    { to: '/ranking',      label: t('nav.ranking'),     icon: '🏆' },
-    { to: '/map',          label: t('nav.map'),         icon: '🗺️'  },
-    { to: '/about-sensors',label: t('nav.sensors'),    icon: '📡' },
-    { to: '/about-icaud',  label: t('nav.howItWorks'), icon: '❓' },
+    { to: '/',             label: t('nav.dashboard'),   icon: '📊', tourId: 'nav-dashboard' },
+    { to: '/ranking',      label: t('nav.ranking'),     icon: '🏆', tourId: 'nav-ranking' },
+    { to: '/map',          label: t('nav.map'),         icon: '🗺️',  tourId: 'nav-map' },
+    { to: '/about-sensors',label: t('nav.sensors'),    icon: '📡', tourId: 'nav-sensors' },
+    { to: '/about-icaud',  label: t('nav.howItWorks'), icon: '❓', tourId: 'nav-howitworks' },
   ];
 
   const toggleLang = () => {
     i18n.changeLanguage(i18n.language === 'en' ? 'pt' : 'en');
   };
+
+  // O tour depende de elementos que só existem no Painel (mapa, alertas,
+  // ranking). Se disparado de outra página, navega pra "/" primeiro.
+  const startTour = () => {
+    if (location.pathname !== '/') {
+      navigate('/');
+      setTimeout(tour.start, 300);
+    } else {
+      tour.start();
+    }
+  };
+
+  // Se o tour automático dispara enquanto o usuário não está no Painel
+  // (ex: entrou direto por /ranking), leva pra lá também.
+  useEffect(() => {
+    if (tour.isActive && tour.stepIndex === 0 && location.pathname !== '/') {
+      navigate('/');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tour.isActive]);
 
   return (
     <div className="min-h-screen bg-gray-50 font-display">
@@ -49,6 +75,7 @@ export default function Layout({ children }) {
                     to={link.to}
                     end={link.to === '/'}
                     aria-label={link.label}
+                    data-tour={link.tourId}
                     className={({ isActive }) =>
                       `flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1 ${
                         isActive
@@ -63,7 +90,7 @@ export default function Layout({ children }) {
                 ))}
               </nav>
 
-              <div className="ml-2">
+              <div className="ml-2" data-tour="a11y-menu">
                 <AccessibilityMenu />
               </div>
 
@@ -76,6 +103,16 @@ export default function Layout({ children }) {
               >
                 {i18n.language === 'en' ? '🇧🇷 PT' : '🇺🇸 EN'}
               </button>
+
+              {/* Reabrir o tour guiado */}
+              <button
+                onClick={startTour}
+                title="Ver tour guiado"
+                aria-label="Ver tour guiado"
+                className="ml-2 flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1"
+              >
+                <span aria-hidden="true">❔</span>
+              </button>
             </div>
           </div>
         </div>
@@ -84,6 +121,16 @@ export default function Layout({ children }) {
       <main id="main-content" tabIndex={-1} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 focus:outline-none">
         {children}
       </main>
+
+      <OnboardingTour
+        isActive={tour.isActive}
+        step={tour.step}
+        stepIndex={tour.stepIndex}
+        total={tour.total}
+        next={tour.next}
+        prev={tour.prev}
+        finish={tour.finish}
+      />
 
       <footer className="border-t border-gray-100 bg-white mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
