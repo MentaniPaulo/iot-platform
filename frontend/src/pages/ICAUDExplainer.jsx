@@ -662,6 +662,20 @@ export default function ICAUDExplainer() {
             </p>
           </div>
 
+          {/* Tour guiado */}
+          <div className="bg-white border border-gray-200 rounded-xl p-6 flex items-start gap-4">
+            <span className="text-3xl" aria-hidden="true">❔</span>
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-1">Novo: tour guiado de primeira visita</h3>
+              <p className="text-sm text-gray-600">
+                Quem entra pela primeira vez recebe um passo a passo com destaque
+                escurecendo o resto da tela — nav principal, mapa ao vivo, filtros,
+                alertas, ranking e o menu de acessibilidade. Pode ser revisto a qualquer
+                momento clicando no <strong>❔</strong> no canto do cabeçalho.
+              </p>
+            </div>
+          </div>
+
           {/* Limitações x Objetivos */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-orange-50 border border-orange-200 rounded-xl p-6">
@@ -717,7 +731,7 @@ export default function ICAUDExplainer() {
                   tag: 'valor pro usuário',
                   status: 'done',
                   title: 'Análise: tendências, qualidade, alertas e acessibilidade',
-                  desc: 'Feito: badge de tendência (melhorando/estável/piorando) na página da cidade, detecção de sensor travado, painel de alertas de pico de poluição no Dashboard. Em acessibilidade: menu no cabeçalho com alto contraste, 3 tamanhos de fonte, reduzir animações e um narrador que lê a página em voz alta — além de contraste de cor corrigido (WCAG AA), skip-link, foco por teclado visível e ARIA em Painel, Ranking, Mapa, Sensores e Como Funciona.',
+                  desc: 'Feito: badge de tendência (melhorando/estável/piorando) na página da cidade, detecção de sensor travado, painel de alertas de pico de poluição no Dashboard. Em acessibilidade: menu no cabeçalho com alto contraste, 3 tamanhos de fonte, reduzir animações e um narrador que lê a página em voz alta — além de contraste de cor corrigido (WCAG AA), skip-link, foco por teclado visível e ARIA em Painel, Ranking, Mapa, Sensores e Como Funciona. E um tour guiado (❔ no cabeçalho) que apresenta a plataforma na primeira visita.',
                 },
                 {
                   num: 4,
