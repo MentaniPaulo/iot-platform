@@ -7,6 +7,11 @@
 import { useEffect, useState, useCallback } from 'react';
 
 const PADDING = 8;
+// Largura do balão em pixels reais (não rem) — precisa ficar em sync com o
+// clamp de posição abaixo. Se usarmos a classe Tailwind `w-80` (rem), o
+// balão fica mais largo em px quando o usuário aumenta o tamanho de fonte
+// no painel de acessibilidade, e o cálculo de posição vaza da tela.
+const TOOLTIP_WIDTH = 320;
 
 function getRect(selector) {
   const el = document.querySelector(selector);
@@ -67,7 +72,7 @@ export default function OnboardingTour({ isActive, step, stepIndex, total, next,
   // Tooltip: tenta ficar abaixo do alvo; se não couber, vai pra cima
   const spaceBelow = window.innerHeight - (rect.top + rect.height);
   const tooltipTop = spaceBelow > 200 ? rect.top + rect.height + 16 : Math.max(16, rect.top - 200);
-  const tooltipLeft = Math.min(Math.max(16, rect.left), window.innerWidth - 336);
+  const tooltipLeft = Math.min(Math.max(16, rect.left), window.innerWidth - TOOLTIP_WIDTH - 16);
 
   return (
     <div className="fixed inset-0 z-[2000]" role="dialog" aria-modal="true" aria-label="Tour guiado">
@@ -87,8 +92,8 @@ export default function OnboardingTour({ isActive, step, stepIndex, total, next,
 
       {/* Balão explicativo */}
       <div
-        className="absolute w-80 bg-white rounded-xl shadow-2xl p-5 transition-all duration-300"
-        style={{ top: tooltipTop, left: tooltipLeft }}
+        className="absolute bg-white rounded-xl shadow-2xl p-5 transition-all duration-300"
+        style={{ top: tooltipTop, left: tooltipLeft, width: TOOLTIP_WIDTH }}
       >
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-semibold text-green-600 uppercase tracking-wide">
